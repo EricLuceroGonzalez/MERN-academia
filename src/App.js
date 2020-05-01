@@ -21,6 +21,7 @@ const App = () => {
           <Route path="/" exact>
             <Users></Users>
           </Route>
+          <Route path="/:userId/places"></Route>
           <Route path="/places/new" exact>
             <NewPlace></NewPlace>
           </Route>
