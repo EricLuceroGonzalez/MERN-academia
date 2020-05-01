@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 
-import "./PlaceItem.css";
 import Modal from "../../shared/components/UIElements/Modal";
 import Card from "../../shared/components/UIElements/Card";
 import Button from "../../shared/components/FormElements/Button";
+import "./PlaceItem.css";
 
 const PlaceItem = (props) => {
   const [showMap, setShowMap] = useState(false);
+
   const openMapHandler = () => {
     setShowMap(true);
   };
@@ -28,6 +29,7 @@ const PlaceItem = (props) => {
           <h2> THE MAP!</h2>
         </div>
       </Modal>
+      {/**  List Items of places */}
       <li className="place-item">
         <Card className="place-item__content">
           <div className="place-item__image">

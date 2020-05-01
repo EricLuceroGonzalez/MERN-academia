@@ -15,14 +15,15 @@ const ModalOverlay = (props) => {
       <form
         //   Submit: check if submitted on (from props) or preventDefault to not reload page on filling form
         onSubmit={
-          props.onSubmit ? props.onSubmit : (event) => event.preventDefault
+          props.onSubmit ? props.onSubmit : (event) => event.preventDefault()
         }
       >
         <div className={`modal__content ${props.contentClass}`}>
           {props.children}
         </div>
-        <footer className={`modal__footer ${props.footerClass}`}></footer>
+        <footer className={`modal__footer ${props.footerClass}`}>
         {props.footer}
+        </footer>
       </form>
     </div>
   );
@@ -32,7 +33,8 @@ const ModalOverlay = (props) => {
 const Modal = (props) => {
   return (
     <React.Fragment>
-      {props.show && <Backdrop onClick={props.onCancel}></Backdrop>}
+    {console.log('hereeeeee')}
+      {props.show && <Backdrop onClick={props.onCancel}/>}
       <CSSTransition
         in={props.show}
         mountOnEnter
@@ -40,8 +42,7 @@ const Modal = (props) => {
         timeout={200}
         classNames="modal"
       >
-      {/**Using the SECOND COMPONENT ABOVE ...props notation (read about) */}
-      <ModalOverlay {...props}></ModalOverlay>
+      <ModalOverlay {...props}/>
       </CSSTransition>
     </React.Fragment>
   );
