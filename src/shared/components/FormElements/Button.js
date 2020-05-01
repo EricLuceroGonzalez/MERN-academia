@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import './Button.css';
 
 const Button = props => {
+  // If have href prop
   if (props.href) {
     return (
       <a
@@ -15,6 +16,7 @@ const Button = props => {
       </a>
     );
   }
+    // If have to prop
   if (props.to) {
     return (
       <Link
