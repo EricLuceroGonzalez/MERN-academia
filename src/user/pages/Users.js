@@ -7,7 +7,7 @@ const Users = () => {
       id: "usr-1",
       image: "https://via.placeholder.com/150",
       name: "Eric Lucero",
-      places: 3,
+      places: 3
     }
   ];
   return <UsersList items={USERS}></UsersList>;

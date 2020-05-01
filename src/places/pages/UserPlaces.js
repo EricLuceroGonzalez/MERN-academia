@@ -1,4 +1,7 @@
 import React from "react";
+import { useParams } from "react-router-dom";
+// To make paramas of routes aware of params at endpoints
+
 import PlaceList from "../components/PlaceList";
 
 const DUMMY_PLACES = [
@@ -14,11 +17,11 @@ const DUMMY_PLACES = [
       lat: 48.8583424,
       lng: 2.3353197,
     },
-    creator: "usr-1"
+    creator: "usr-1",
   },
   {
     id: "id-2",
-    title: "Pont Des Arts",
+    title: "Pont Neuf",
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Pont_des_Arts%2C_6e_Arrondissement%2C_Paris_%28HDR%29_20140320_1.jpg/1024px-Pont_des_Arts%2C_6e_Arrondissement%2C_Paris_%28HDR%29_20140320_1.jpg",
     description:
@@ -28,11 +31,15 @@ const DUMMY_PLACES = [
       lat: 48.8583424,
       lng: 2.3353197,
     },
-    creator: "usr-1"
-  }
+    creator: "usr-2",
+  },
 ];
 const UserPlaces = () => {
-  return <PlaceList items={}></PlaceList>;
+  // Get acces to the userId at this route (see App.js)
+  const userId = useParams().userId;
+  //   Filter the userId and show filtered
+  const loadedPlaces = DUMMY_PLACES.filter((place) => place.creator === userId);
+  return <PlaceList items={loadedPlaces}></PlaceList>;
 };
 
 export default UserPlaces;
