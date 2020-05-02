@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useEffect } from "react";
 
 import "./Input.css";
 import { validate } from "../../util/validators";
@@ -35,6 +35,14 @@ const Input = (props) => {
     isTouched: false,
     isValid: false,
   });
+
+  //   Runs logic when some render changes (if props or inputState changes) this function run
+  const { id, onInput } = props;
+  const { value, isValid } = inputState;
+
+  useEffect(() => {
+    onInput(id, value, isValid);
+  }, [id, value, isValid, onInput]);
 
   // change data handler:
   const changeHandler = (event) => {
