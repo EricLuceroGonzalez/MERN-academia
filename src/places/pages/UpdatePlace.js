@@ -46,7 +46,7 @@ const UpdatePlace = () => {
   //   Find specfic place from data
   const identifiedPlace = DUMMY_PLACES.find((item) => item.id === placeId);
   //   Handle place find success/fail
-=
+
   if (!identifiedPlace) {
     return (
       <div>
