@@ -31,13 +31,13 @@ const inputReducer = (state, action) => {
 const Input = (props) => {
   // The reducer that receive state and update
   const [inputState, dispatch] = useReducer(inputReducer, {
-    value: props.value || "",
+    value: props.initialValue || "",
     isTouched: false,
-    isValid: props.valid || false,
+    isValid: props.initialValid || false,
   });
 
   //   Runs logic when some render changes (if props or inputState changes) this function run
-  const { id, onInput } = props;  // Load from props
+  const { id, onInput } = props; // Load from props
   const { value, isValid } = inputState;
 
   // useEffect runs logic wnd something change
