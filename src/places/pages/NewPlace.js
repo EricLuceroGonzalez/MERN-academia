@@ -7,7 +7,7 @@ import {
   VALIDATOR_REQUIRE,
   VALIDATOR_MINLENGTH,
 } from "../../shared/util/validators";
-import "./NewPlace.css";
+import "./PlaceForm.css";
 
 // Receives state and action and return new state
 const formReducer = (state, action) => {
@@ -63,8 +63,14 @@ const NewPlace = () => {
     });
   }, []);
 
+  // manage Submint of the form:
+  const newPlaceSumbitHandler = (event) => {
+    event.preventDefault();
+    console.log(formState);
+  };
+
   return (
-    <form className="place-form">
+    <form className="place-form" onSubmit={newPlaceSumbitHandler}>
       <Input
         id="title"
         element="input"
@@ -83,7 +89,18 @@ const NewPlace = () => {
         errorText="Enter a valid description (at least 5 characters)."
         onInput={inputHandler}
       ></Input>
-      <Button type="submit" disabled={!formState.isValid}>ADD PLACE</Button>
+      <Input
+      id="address"
+      element="input"
+      type="text"
+      label="Address"
+      validators={[VALIDATOR_REQUIRE()]}
+      errorText="Please enter a valid address"
+      onInput={inputHandler}
+    ></Input>
+      <Button type="submit" disabled={!formState.isValid}>
+        ADD PLACE
+      </Button>
     </form>
   );
 };
