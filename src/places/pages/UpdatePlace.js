@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
@@ -8,6 +8,7 @@ import {
 } from "../../shared/util/validators";
 import { useForm } from "../../shared/hooks/form-hook";
 import "./PlaceForm.css";
+import Card from "../../shared/components/UIElements/Card";
 
 // Add some dum data
 const DUMMY_PLACES = [
@@ -42,46 +43,74 @@ const DUMMY_PLACES = [
 ];
 
 const UpdatePlace = () => {
+  const [isLoading, setIsLoading] = useState(true);
   // To pass params from outside (Route)
   const placeId = useParams().placeId;
 
-  //   Find specfic place from data
-  const identifiedPlace = DUMMY_PLACES.find((item) => item.id === placeId);
-
+  // Initialize state
   // WE call useForm and pass the parameters:
-  const [formState, inputHandler] = useForm(
+  const [formState, inputHandler, setFormData] = useForm(
     {
       title: {
-        value: '',
+        value: "",
         isValid: false,
       },
       description: {
-        value: '',
+        value: "",
         isValid: false,
       },
     },
     false
   );
 
+  //   Find specfic place from data
+  const identifiedPlace = DUMMY_PLACES.find((item) => item.id === placeId);
+
+  useEffect(() => {
+    if (identifiedPlace) {
+      setFormData(
+        {
+          title: {
+            value: identifiedPlace.title,
+            isValid: true,
+          },
+          description: {
+            value: identifiedPlace.description,
+            isValid: true,
+          },
+        },
+        true
+      );
+    }
+    setIsLoading(false);
+  }, [setFormData, identifiedPlace]);
+
   // SUbmision
-  const PlaceUpdateSubmit = (event) => {
-    event.preventDefault()
+  const placeUpdateSubmit = (event) => {
+    event.preventDefault();
     console.log(formState.inputs);
-    
-  }
+  };
 
   //   Handle place find success/fail
   if (!identifiedPlace) {
     return (
-      <div>
+      <Card>
         <h2>Could not find places!</h2>
-      </div>
+      </Card>
     );
   }
 
+  // Render form if there is data to:
+  if (isLoading) {
+    return (
+      <div className="center">
+        <h2>Loading...</h2>
+      </div>
+    );
+  }
   // If we find that place (we want to update) lets RETURN a form to be updated:
   return (
-    <form className="place-form">
+    <form className="place-form" onSubmit={placeUpdateSubmit}>
       {/*Create an input to update title: */}
       <Input
         id="title"
