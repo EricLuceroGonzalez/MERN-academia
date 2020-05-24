@@ -60,7 +60,7 @@ const App = () => {
         <Route path="/auth">
           <Auth></Auth>
         </Route>
-        <Redirect to="/"></Redirect>
+        <Redirect to="/auth"></Redirect>
       </Switch>
     );
   }
