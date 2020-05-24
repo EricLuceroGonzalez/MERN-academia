@@ -6,6 +6,7 @@ import Button from "../../shared/components/FormElements/Button";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 import { useForm } from "../../shared/hooks/form-hook";
+import { useHttpClient } from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/context/auth-context";
 import {
   VALIDATOR_EMAIL,
@@ -18,9 +19,9 @@ const Auth = () => {
   const auth = useContext(AuthContext);
   // LOGIN or SIGNUP state mode
   const [isLoginMode, setIsLoginMode] = useState(true);
-  // is Loading
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(false);
+  // is Loading is managed by hook
+  const { isLoading, error, sendRequest, clearError } = useHttpClient;
+
   // Initialize state with form-hook
   const [formState, inputHandler, setFormData] = useForm(
     {
@@ -58,70 +59,45 @@ const Auth = () => {
   const authSubmitHandler = async (event) => {
     event.preventDefault();
 
-    // ON the loading state:
-    setIsLoading(true);
-
     if (isLoginMode) {
-      console.log(`isLoginMode: ${isLoginMode}`);
-      // HTTP Request: fetch()
       try {
-        const response = await fetch("http://localhost:3001/api/users/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+        await sendRequest(
+          "http://localhost:3001/api/users/login",
+          "POST",
+          JSON.stringify({
             email: formState.inputs.email.value,
             password: formState.inputs.password.value,
           }),
-        });
-        // ---> Return the fetched signup data
-        const responseData = await response.json();
-        // Check if response from server is OK (no 400's code or 500's code):
-        if (!response.ok) {
-          throw new Error(responseData.message);
-        }
-        // login has terminated so:
-        setIsLoading(false);
-        // Change the state of Context
+          { "Content-Type": "application/json" }
+        );
+
         auth.login();
       } catch (err) {
-        console.log(`Error: ${err}`);
-        // login has terminadet so:
-        setIsLoading(false);
-        setError(err.message || "Some error ocurred, please try again.");
+        console.log(`some Error: ${err}`);
       }
     } else {
       // HTTP Request: fetch()
       try {
-        const response = await fetch("http://localhost:3001/api/users/signup", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+        await sendRequest(
+          "http://localhost:3001/api/users/signup",
+          "POST",
+          JSON.stringify({
             name: formState.inputs.name.value,
             email: formState.inputs.email.value,
             password: formState.inputs.password.value,
           }),
-        });
-        // ---> Return the fetched signup data
-        const responseData = await response.json();
-        // Check if response from server is OK (no 400's code or 500's code):
-        if (!response.ok) {
-          throw new Error(responseData.message);
-        }
-        console.log(responseData);
-        // login has terminated so:
-        setIsLoading(false);
+          { "Content-Type": "application/json" }
+        );
         // Change the state of Context
         auth.login();
       } catch (err) {
         console.log(`Error: ${err}`);
-        // login has terminadet so:
-        setIsLoading(false);
-        setError(err.message || "Some error ocurred, please try again.");
       }
     }
   };
+
   const errorHandler = () => {
-    setError(null);
+    clearError();
   };
   return (
     <React.Fragment>

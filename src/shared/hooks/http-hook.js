@@ -24,16 +24,23 @@ export const useHttpClient = () => {
         });
 
         const responseData = await response.json();
+
+        // Remove all the abort controllers we pushed
+        activeHttpRequest.current = activeHttpRequest.current.filter(
+          (reqCtrl) => reqCtrl !== httpAbortCtrll
+        );
         // Check if response on error is not for 400's or 500's
         if (!response.ok) {
           throw new Error(responseData.message);
         }
+        setIsLoading(false);
         //   RETURN the response to the hook user:
         return responseData;
       } catch (err) {
         setError(err.message);
+        setIsLoading(false);
+        throw err;
       }
-      setIsLoading(false);
     },
     []
   );
