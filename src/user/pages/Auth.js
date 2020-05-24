@@ -20,7 +20,7 @@ const Auth = () => {
   // LOGIN or SIGNUP state mode
   const [isLoginMode, setIsLoginMode] = useState(true);
   // is Loading is managed by hook
-  const { isLoading, error, sendRequest, clearError } = useHttpClient;
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
   // Initialize state with form-hook
   const [formState, inputHandler, setFormData] = useForm(
