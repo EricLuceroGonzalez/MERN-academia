@@ -10,7 +10,7 @@ import { useHttpClient } from "../../shared/hooks/http-hook";
 const UserPlaces = () => {
   const [loadedPlaces, setLoadedPlaces] = useState();
   // Bring the http-hook variables
-  const {isLoading, error, sendRequest, clearError} = useHttpClient();
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
   // Get acces to the userId at this route (see App.js)
   const userId = useParams().userId;
@@ -25,12 +25,18 @@ const UserPlaces = () => {
         setLoadedPlaces(responseData.places);
       } catch (err) {
         console.log(`Some error: ${err}`);
-        
       }
     };
     fectchPlaces();
   }, [sendRequest, userId]);
 
+  // When a place is deleted from UserPlaces ==> PlaceList ==> PlaceItem
+  const placeDeletedHandler = (deletedPlaceId) => {
+    // Re render all places excep the ones with the deleted place ID
+    setLoadedPlaces((prevPlaces) =>
+      prevPlaces.filter((place) => place.id !== deletedPlaceId)
+    );
+  };
   return (
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
@@ -40,7 +46,10 @@ const UserPlaces = () => {
         </div>
       )}
       {!isLoading && loadedPlaces && (
-        <PlaceList items={loadedPlaces}></PlaceList>
+        <PlaceList
+          items={loadedPlaces}
+          onDeletePlace={placeDeletedHandler}
+        ></PlaceList>
       )}
     </React.Fragment>
   );
