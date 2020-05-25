@@ -5,9 +5,12 @@ import Card from "../../shared/components/UIElements/Card";
 import Button from "../../shared/components/FormElements/Button";
 import Map from "../../shared/components/UIElements/Map";
 import { AuthContext } from "../../shared/context/auth-context";
+import { useHttpClient } from "../../shared/hooks/http-hook";
 import "./PlaceItem.css";
 
 const PlaceItem = (props) => {
+  // Bring th http HOOK data:
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
   // :LISTEN authContext to check if user is logged and show some content IF is log in
   const auth = useContext(AuthContext);
   const [showMap, setShowMap] = useState(false);
@@ -28,8 +31,13 @@ const PlaceItem = (props) => {
     setShowConfirmationModal(false);
   };
 
-  const confirmDeleteHandler = () => {
+  const confirmDeleteHandler = async () => {
     console.log("Deleting...");
+    // call the HTTP REQUEST to delete this
+    try {
+      await sendRequest(`http"//localhost:3001/api/places/${props.id}`, "DELETE");
+      
+    } catch (err) {}
   };
   return (
     <React.Fragment>
@@ -79,8 +87,15 @@ const PlaceItem = (props) => {
             <Button inverse onClick={openMapHandler}>
               VIEW ON MAP
             </Button>
-            {auth.isLoggedIn && <Button to={`/places/${props.id}`}>EDIT</Button>}
-            {auth.isLoggedIn && <Button danger onClick={showDeleteWarningHandler}> DELETE </Button>}
+            {auth.isLoggedIn && (
+              <Button to={`/places/${props.id}`}>EDIT</Button>
+            )}
+            {auth.isLoggedIn && (
+              <Button danger onClick={showDeleteWarningHandler}>
+                {" "}
+                DELETE{" "}
+              </Button>
+            )}
           </div>
         </Card>
       </li>

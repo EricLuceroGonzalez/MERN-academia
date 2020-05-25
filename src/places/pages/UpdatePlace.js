@@ -1,53 +1,33 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState, useContext } from "react";
+import { useParams, useHistory } from "react-router-dom";
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import {
   VALIDATOR_REQUIRE,
   VALIDATOR_MINLENGTH,
 } from "../../shared/util/validators";
 import { useForm } from "../../shared/hooks/form-hook";
+import { useHttpClient } from "../../shared/hooks/http-hook";
+import { AuthContext } from "../../shared/context/auth-context";
+
 import "./PlaceForm.css";
 import Card from "../../shared/components/UIElements/Card";
 
-// Add some dum data
-const DUMMY_PLACES = [
-  {
-    id: "id-1",
-    title: "Pont Des Arts",
-    imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Pont_des_Arts%2C_6e_Arrondissement%2C_Paris_%28HDR%29_20140320_1.jpg/1024px-Pont_des_Arts%2C_6e_Arrondissement%2C_Paris_%28HDR%29_20140320_1.jpg",
-    description:
-      "Conecta el Quai Malaquais y el Quai Conti a la altura del Instituto de Francia, en el distrito VI, con el Quai François-Mitterrand y el Quai du Louvre a la altura del Cour Carrée del Palacio del Louvre (que se llamaba «Palais des Arts» durante el Primer Imperio), en el distrito I. ",
-    address: "Pont des Arts, 75006 Paris, Francia",
-    location: {
-      lat: 48.8583424,
-      lng: 2.3353197,
-    },
-    creator: "usr-1",
-  },
-  {
-    id: "id-2",
-    title: "Pont Neuf",
-    imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Pont_des_Arts%2C_6e_Arrondissement%2C_Paris_%28HDR%29_20140320_1.jpg/1024px-Pont_des_Arts%2C_6e_Arrondissement%2C_Paris_%28HDR%29_20140320_1.jpg",
-    description:
-      "Conecta el Quai Malaquais y el Quai Conti a la altura del Instituto de Francia, en el distrito VI, con el Quai François-Mitterrand y el Quai du Louvre a la altura del Cour Carrée del Palacio del Louvre (que se llamaba «Palais des Arts» durante el Primer Imperio), en el distrito I. ",
-    address: "Pont des Arts, 75006 Paris, Francia",
-    location: {
-      lat: 48.8583424,
-      lng: 2.3353197,
-    },
-    creator: "usr-2",
-  },
-];
-
 const UpdatePlace = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  // Point useContext to AuthContext:
+  const auth = useContext(AuthContext);
+  // Bring the HTTP-HOOK
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  // Set the history Object
+  const history = useHistory();
+
+  // Initialize state
+  const [loadedPlace, setLoadedPlace] = useState();
   // To pass params from outside (Route)
   const placeId = useParams().placeId;
 
-  // Initialize state
   // WE call useForm and pass the parameters:
   const [formState, inputHandler, setFormData] = useForm(
     {
@@ -63,80 +43,101 @@ const UpdatePlace = () => {
     false
   );
 
-  //   Find specfic place from data
-  const identifiedPlace = DUMMY_PLACES.find((item) => item.id === placeId);
-
+  // FETCH DATA
   useEffect(() => {
-    if (identifiedPlace) {
-      setFormData(
-        {
-          title: {
-            value: identifiedPlace.title,
-            isValid: true,
+    const fetchedPlace = async () => {
+      try {
+        const responseData = await sendRequest(
+          `http://localhost:3001/api/places/${placeId}`
+        );
+        setLoadedPlace(responseData.place);
+        setFormData(
+          {
+            title: {
+              value: responseData.place.title,
+              isValid: true,
+            },
+            description: {
+              value: responseData.place.description,
+              isValid: true,
+            },
           },
-          description: {
-            value: identifiedPlace.description,
-            isValid: true,
-          },
-        },
-        true
-      );
-    }
-    setIsLoading(false);
-  }, [setFormData, identifiedPlace]);
+          true
+        );
+      } catch (err) {}
+    };
+    fetchedPlace();
+  }, [sendRequest, placeId, setFormData]);
 
   // SUbmision
-  const placeUpdateSubmit = (event) => {
+  const placeUpdateSubmit = async (event) => {
     event.preventDefault();
-    console.log(formState.inputs);
+    // HTTP REQUEST to PATH the update:
+    try {
+      await sendRequest(
+        `http://localhost:3001/api/places/${placeId}`,
+        "PATCH",
+        JSON.stringify({
+          title: formState.inputs.title.value,
+          description: formState.inputs.description.value,
+        }),
+        { "Content-Type": "application/json" }
+      );
+      // Push to the user's places page (give USERID from context)
+      history.push(`/${auth.userId}/places`);
+    } catch (err) {}
   };
 
+  // Render form if there is data to:
+  if (isLoading) {
+    return (
+      <div className="center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
   //   Handle place find success/fail
-  if (!identifiedPlace) {
+  if (!loadedPlace && error) {
     return (
       <Card>
         <h2>Could not find places!</h2>
       </Card>
     );
   }
-
-  // Render form if there is data to:
-  if (isLoading) {
-    return (
-      <div className="center">
-        <h2>Loading...</h2>
-      </div>
-    );
-  }
   // If we find that place (we want to update) lets RETURN a form to be updated:
   return (
-    <form className="place-form" onSubmit={placeUpdateSubmit}>
-      {/*Create an input to update title: */}
-      <Input
-        id="title"
-        element="input"
-        type="text"
-        validators={[VALIDATOR_REQUIRE()]}
-        errorText="Please enter some valid value"
-        label="Title"
-        onInput={inputHandler}
-        initialValue={formState.inputs.title.value}
-        initialValid={formState.inputs.title.isValid}
-      />
-      <Input
-        id="description"
-        element="textarea"
-        validators={[VALIDATOR_MINLENGTH(5)]}
-        errorText="Please enter some valid description (min. 5 characters)"
-        label="Description"
-        onInput={inputHandler}
-        initialValue={formState.inputs.description.value}
-        initialValid={formState.inputs.description.isValid}
-      />
-      <Button type="submit" disabled={!formState.isValid}>
-        Update Place
-      </Button>
-    </form>
+    <React.Fragment>
+      <ErrorModal error={error} onClear={clearError} />
+      {!isLoading && loadedPlace && (
+        <form className="place-form" onSubmit={placeUpdateSubmit}>
+          {/*Create an input to update title: */}
+          <Input
+            id="title"
+            element="input"
+            type="text"
+            validators={[VALIDATOR_REQUIRE()]}
+            errorText="Please enter some valid value"
+            label="Title"
+            onInput={inputHandler}
+            initialValue={loadedPlace.title}
+            initialValid={true}
+          />
+          <Input
+            id="description"
+            element="textarea"
+            validators={[VALIDATOR_MINLENGTH(5)]}
+            errorText="Please enter some valid description (min. 5 characters)"
+            label="Description"
+            onInput={inputHandler}
+            initialValue={loadedPlace.description}
+            initialValid={true}
+          />
+          <Button type="submit" disabled={!formState.isValid}>
+            Update Place
+          </Button>
+        </form>
+      )}
+    </React.Fragment>
   );
 };
 
