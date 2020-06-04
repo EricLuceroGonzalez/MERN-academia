@@ -97,7 +97,7 @@ const Auth = () => {
           formData
         );
         // Change the state of Context
-        auth.login(responseData.user.id);
+        auth.login(responseData.userId, responseData.token);
       } catch (err) {
         console.log(`Signup error: ${err}`);
       }
