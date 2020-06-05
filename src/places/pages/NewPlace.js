@@ -60,9 +60,14 @@ const NewPlace = () => {
     event.preventDefault();
     try {
       // Start the HTTP request + set the Authorization token
-      await sendRequest("http://localhost:3001/api/places", "POST", formData, {
-        Authorization: "Bearer " + auth.token,
-      });
+      await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/places`,
+        "POST",
+        formData,
+        {
+          Authorization: "Bearer " + auth.token,
+        }
+      );
       // Redirect the user to different page
       history.push("/");
     } catch (err) {}

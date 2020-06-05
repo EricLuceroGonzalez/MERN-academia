@@ -38,7 +38,7 @@ const PlaceItem = (props) => {
     // call the HTTP REQUEST to delete this
     try {
       await sendRequest(
-        `http://localhost:3001/api/places/${props.id}`,
+        `${process.env.REACT_APP_BACKEND_URL}/places/${props.id}`,
         "DELETE",
         null,
         { Authorization: "Bearer " + auth.token }
@@ -86,7 +86,7 @@ const PlaceItem = (props) => {
           {isLoading && <LoadingSpinner asOverlay />}
           <div className="place-item__image">
             <img
-              src={`http://localhost:3001/${props.image}`}
+              src={`${process.env.REACT_APP_ASSETS}/${props.image}`}
               alt={props.title}
             ></img>
           </div>
