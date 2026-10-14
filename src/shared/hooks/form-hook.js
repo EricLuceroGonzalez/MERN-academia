@@ -19,7 +19,7 @@ const formReducer = (state, action) => {
           formIsValid = formIsValid && state.inputs[inputId].isValid;
         }
       }
-      // Return new state accodung to the input is changing
+      // Return new state according to the input is changing
       return {
         ...state,
         inputs: {
@@ -49,7 +49,7 @@ export const useForm = (initialInputs, initialFormValidity) => {
   });
 
   //   From NewPlace.js
-  // Funcition
+  // Function
   const inputHandler = useCallback((id, value, isValid) => {
     // Use Callback hook to stop the infinite loop create function of functions (reuse)
     dispatch({
